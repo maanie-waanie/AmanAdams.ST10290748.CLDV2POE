@@ -1,4 +1,5 @@
 using CLDV2POE.Services;
+using Microsoft.AspNetCore.Hosting;
 
 
 namespace CLDV2POE
@@ -9,8 +10,12 @@ namespace CLDV2POE
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            //CreateHostBuilder(args).Build().Run();
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            //builder.Services.AddHttpClient<BlobService>();
 
             // Register your custom services
             builder.Services.AddSingleton<BlobService>();
@@ -41,5 +46,11 @@ namespace CLDV2POE
 
             app.Run();
         }
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Program>();
+            });
     }
 }
