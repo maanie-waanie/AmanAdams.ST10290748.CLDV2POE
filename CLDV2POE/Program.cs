@@ -15,13 +15,20 @@ namespace CLDV2POE
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+
+            builder.Services.AddHttpClient();
+            builder.Services.AddControllersWithViews();
+
             //builder.Services.AddHttpClient<BlobService>();
 
+            builder.Services.AddScoped<TableService>();
+            builder.Services.AddScoped<BlobService>();
+
             // Register your custom services
-            builder.Services.AddSingleton<BlobService>();
-            builder.Services.AddSingleton<TableService>();
-            builder.Services.AddSingleton<QueueService>();
-            builder.Services.AddSingleton<FileService>();
+            //builder.Services.AddSingleton<BlobService>();
+            //builder.Services.AddSingleton<TableService>();
+            //builder.Services.AddSingleton<QueueService>();
+            //builder.Services.AddSingleton<FileService>();
 
             var app = builder.Build();
 
@@ -33,7 +40,7 @@ namespace CLDV2POE
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

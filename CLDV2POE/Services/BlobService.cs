@@ -3,6 +3,10 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
+
 
 namespace CLDV2POE.Services
 {
@@ -29,21 +33,46 @@ namespace CLDV2POE.Services
     //}
 
 
+    //public class BlobService
+    //{
+    //    private readonly BlobServiceClient _blobServiceClient;
+
+    //    public BlobService(IConfiguration configuration)
+    //    {
+    //        _blobServiceClient = new BlobServiceClient(configuration["AzureStorage:ConnectionString"]);
+    //    }
+
+    //    public async Task UploadBlobAsync(string containerName, string blobName, Stream content)
+    //    {
+    //        var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
+    //        await containerClient.CreateIfNotExistsAsync();
+    //        var blobClient = containerClient.GetBlobClient(blobName);
+    //        await blobClient.UploadAsync(content, true);
+    //    }
+    //}
+
     public class BlobService
     {
-        private readonly BlobServiceClient _blobServiceClient;
+        private readonly IConfiguration _configuration;
 
         public BlobService(IConfiguration configuration)
         {
-            _blobServiceClient = new BlobServiceClient(configuration["AzureStorage:ConnectionString"]);
+            _configuration = configuration;
         }
 
-        public async Task UploadBlobAsync(string containerName, string blobName, Stream content)
+        public async Task InsertBlobAsync(byte[] imageData)
         {
-            var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-            await containerClient.CreateIfNotExistsAsync();
-            var blobClient = containerClient.GetBlobClient(blobName);
-            await blobClient.UploadAsync(content, true);
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            var query = @"INSERT INTO BlobTable (BlobImage) VALUES (@BlobImage)";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@BlobImage", imageData);
+
+                connection.Open();
+                await command.ExecuteNonQueryAsync();
+            }
         }
     }
 }
